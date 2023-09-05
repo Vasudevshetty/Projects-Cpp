@@ -32,6 +32,7 @@ public:
     ~Linkedlist();
     bool loop();
     int getLength(){ return count; }
+    void append(Linkedlist<T> &l);
     bool circular();
     Node<T>* getHead(){ return head; }
     void setHead(Node<T>* head){ this->head = head; }
@@ -92,7 +93,7 @@ public:
     void removeDuplicates();
     void reverse();
     void rev(Node<T>* p, Node<T>* q);
-    void append(Linkedlist<T> &l);
+    void removeDuplicates(bool nonconsective);
     void merge(Linkedlist<T> &p, Linkedlist<T> &q);
     T Delete(int pos, bool circular);
     Node<T>* middle();
@@ -292,6 +293,25 @@ void Linkedlist<T>::removeDuplicates(){
             delete curr;
         }
         temp = temp->getNext();
+    }
+}
+
+template <class T>
+void Linkedlist<T>::removeDuplicates(bool nonconsective){
+    if(!nonconsective) return;
+    Node<T>* temp = getHead();
+    Node<T>* curr = NULL;
+    unordered_set<T> seen;
+    while(temp){
+        if(seen.count(temp->getdata())){
+            curr->setNext(temp->getNext());
+            delete temp;
+            temp = curr->getNext();
+        }else{
+            seen.insert(temp->getdata());
+            curr = temp;
+            temp = temp->getNext();
+        }
     }
 }
 
