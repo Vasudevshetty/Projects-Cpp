@@ -315,7 +315,7 @@ public:
         Node<T>* tRight = temp->rchild;
         Node<T>* trLeft = tRight->lchild;
 
-        tRight->lchild = trLeft->rchild;
+        tRight->rchild = trLeft->rchild;
         temp->rchild = trLeft->lchild;
 
         trLeft->lchild = temp;
