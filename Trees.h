@@ -12,7 +12,10 @@ public:
         this->data = data;
         rchild = lchild = NULL;       
     }
+    int height;
+    
 };
+
 
 template <class T>
 void preOrder(Node<T>* root){
@@ -243,4 +246,107 @@ public:
         cout << endl;
         return os;
     }
+};
+
+template <class T>
+class AVLtrees{
+private:
+    Node<T>* root;
+public:
+    AVLtrees() : root(nullptr) {}
+    void setRoot(Node<T>* root){ this->root = root; }
+    Node<T>* getRoot(){ return root; }
+    AVLtrees(Node<T>* root){ this->root = root; }
+    int nodeHeight(Node<T>* temp){
+        int hl, hr;
+        hl = temp && temp->lchild ? temp->lchild->height : 0;
+        hr = temp && temp->rchild ? temp->rchild->height : 0;
+        return hl>hr ? hl + 1 : hr + 1;
+    }
+    int balanceFactor(Node<T>* temp){
+        int hl, hr;
+        hl = temp && temp->lchild ? temp->lchild->height : 0;
+        hr = temp && temp->rchild ? temp->rchild->height : 0;
+        return hl - hr;
+    }
+    Node<T>* LLRotation(Node<T>* temp){
+        Node<T>* tLeft = temp->lchild;
+        Node<T>* tlRight = tLeft->rchild;
+
+        tLeft->rchild = temp;
+        temp->lchild = tlRight;
+        temp->height = nodeHeight(temp);
+        tLeft->height = nodeHeight(tLeft);
+
+        if(temp == getRoot()) setRoot(tLeft);
+        return tLeft; 
+    }
+    Node<T>* RRRotation(Node<T>* temp){
+        Node<T>* tRight = temp->rchild;
+        Node<T>* trLeft = tRight->rchild;
+
+        tRight->lchild = temp;
+        temp->rchild = trLeft;
+        temp->height = nodeHeight(temp);
+        tRight->height = nodeHeight(tRight);
+
+        if(temp == getRoot()) setRoot(tRight);
+        return tRight; 
+    }
+    Node<T>* LRRotation(Node<T>* temp){
+        Node<T>* tLeft = temp->lchild;
+        Node<T>* tlRight = tLeft->rchild;
+
+        tLeft->rchild = tlRight->lchild;
+        temp->lchild = tlRight->rchild;
+
+        tlRight->lchild = tLeft;
+        tlRight->rchild = temp;
+
+        tLeft->height = nodeHeight(tLeft);
+        tlRight->height = nodeHeight(tlRight);
+        temp->height = nodeHeight(temp);
+
+        if(temp == getRoot()) setRoot(tlRight);
+
+        return tlRight;
+    }
+    Node<T>* RLRotation(Node<T>* temp){
+        Node<T>* tRight = temp->rchild;
+        Node<T>* trLeft = tRight->lchild;
+
+        tRight->lchild = trLeft->rchild;
+        temp->rchild = trLeft->lchild;
+
+        trLeft->lchild = temp;
+        trLeft->rchild = tRight;
+
+        tRight->height = nodeHeight(tRight);
+        trLeft->height = nodeHeight(trLeft);
+        temp->height = nodeHeight(temp);
+
+        if(temp == getRoot()) setRoot(trLeft);
+
+        return trLeft;
+    }
+    Node<T>* InsertR(Node<T>* curr, T data){
+        Node<T>* temp = new Node<T>(data);
+        if(!curr){
+            temp->height = 1;
+            return temp;
+        }
+        if(data < curr->data) curr->lchild = InsertR(curr->lchild, data);
+        else if(data > curr->data) curr->rchild = InsertR(curr->rchild, data);
+        curr->height = nodeHeight(curr);
+
+        if(balanceFactor(curr) == 2 && balanceFactor(curr->lchild) == 1) return LLRotation(curr);
+        else if(balanceFactor(curr) == 2 && balanceFactor(curr->lchild)== -1) return LRRotation(curr);
+        else if(balanceFactor(curr) == -2 && balanceFactor(curr->rchild)== 1) return RRRotation(curr);
+        else if(balanceFactor(curr) == -2 && balanceFactor(curr->rchild)== -1) return RLRotation(curr);
+        return curr;
+    }
+    void Insert(T data){
+        setRoot(InsertR(getRoot(), data));  
+    }
+
 };
